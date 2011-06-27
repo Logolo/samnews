@@ -101,7 +101,7 @@ jQuery(function() {
         <table class="form_table" width="500">
             <tr><td><strong>title</strong><br />
             <div style="padding-bottom:4px;"><input type="text" name="title" style="width:98%;" maxlength="120" onKeyDown="textCounter(this.form.title,this.form.remLen_1,120);" onKeyUp="textCounter(this.form.title,this.form.remLen_1,120);" value="<?php if(isset($_POST['title'])) { echo stripslashes(htmlentities(replace_schars(trim($_POST['title'])))); } elseif($mode == "edit") { echo stripslashes(htmlentities(trim($post_result[0]['title']))); } ?>" /></div>
-            <input disabled type="text" name="remLen_1" size="3" maxlength="3" value="120"> characters left</td></td></tr>
+            <input disabled type="text" name="remLen_1" size="3" maxlength="3" value="120"> characters left</td></tr>
         </table>
 		<?php if($mode == "edit") { ?>
         <br />

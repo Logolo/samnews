@@ -28,7 +28,7 @@ ini_set("display_errors", 1);
 // version
 define('VERSION','1.1');
 
-// database
+// database settings
 if(!file_exists('settings_db.php')) die('settings_db.php Missing');
 include('settings_db.php');
 

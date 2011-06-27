@@ -17,7 +17,8 @@
 
 include('config.php');
 
-$view = samq_c("SELECT post.id, users.id AS author_id, title, slug, url, description, domain, post.comment_count, login, users.voted_count AS user_score, post.score AS post_score, post.created, category.name AS cat_name FROM post
+$view = samq_c("SELECT post.id, users.id AS author_id, title, slug, url, description, domain, post.comment_count, login,
+				users.voted_count AS user_score, post.score AS post_score, post.created, category.name AS cat_name FROM post
 				INNER JOIN users ON author = users.id
 				INNER JOIN category ON category = category.id
 				WHERE slug = '" . esc($_GET['post']) . "'",1);
@@ -49,7 +50,13 @@ if(count($view) > 0) { ?>
                 <td class="listing_left_spacer1_td"></td>
                 <td class="listing_count_td"></td>
                 <td class="listing_left_spacer2_td"></td>
-                <td class="listing_votes_td"><span class="listing_votes_outer" id="listing_votes_outer<?php echo $e['id']; ?>"><a href="<?php echo SITE_URL; ?>/v/<?php echo $e['slug']; ?>"><span id="listing_votes_inner<?php echo $e['id']; ?>"><?php echo $e['post_score']; ?></span></a></span></td>
+                <td class="listing_votes_td">
+					<span class="listing_votes_outer" id="listing_votes_outer<?php echo $e['id']; ?>">
+						<a href="<?php echo SITE_URL; ?>/v/<?php echo $e['slug']; ?>">
+							<span id="listing_votes_inner<?php echo $e['id']; ?>"><?php echo $e['post_score']; ?></span>
+						</a>
+					</span>
+				</td>
                 <td class="listing_up_td">
                     <span<?php if($vote_check == "vote") echo " style='display:none;'"; ?> id="vote_arrow<?php echo $e['id']; ?>">
                         <?php if($vote_check != "guest") { ?><a href="#" class="vote_up" id="<?php echo $e['id']; ?>"><?php } ?>
@@ -60,9 +67,44 @@ if(count($view) > 0) { ?>
                         <img src="<?php echo IMAGES_PATH; ?>up_voted.gif" alt="voted up" />
                     </span>
                 </td>
-                <td><span class="listing_title"><a href="<?php echo htmlentities($e['url']); ?>" target="_blank"><?php echo $e['title']; ?></a></span><span class="listing_category"><?php echo $e['cat_name']; ?></span> <?php if(isset($_SESSION['access']) && ($_SESSION['access'] == 2 || $_SESSION['access'] == 3)) { ?> <span class="admin_link"><a href="<?php echo SITE_URL . "/edit/p/" . $e['id'] ?>">edit</a></span> <span class="admin_link"><a href="<?php echo SITE_URL . "/delete/p/" . $e['id'] ?>">delete</a></span><?php } ?></span></td></tr>
-            <tr><td colspan="5"></td><td><span class="listing_details">submitted <?php echo time_since(strtotime($e['created'])); ?> by <a href="<?php echo SITE_URL; ?>/u/<?php echo $e['login']; ?>"><?php echo $e['login']; ?></a>(<?php echo $e['user_score'];?>) | <span class="listing_domain"><?php echo $e['domain']; ?></span> | <a href="#comment_start"><?php if($e['comment_count'] == 0) { echo "no comments"; } else { echo $e['comment_count'] . " comment" . (($e['comment_count'] > 1) ? "s" : ""); } ?></a></td></tr>
-            <tr><td colspan="5"></td><td style="padding-top:10px;"><div style="float:left;"><iframe src="http://www.facebook.com/plugins/like.php?href=<?php echo urlencode(SITE_URL); ?>%2Fv%2F<?php echo $e['slug']; ?>&amp;layout=standard&amp;show_faces=true&amp;width=210&amp;action=like&amp;font=verdana&amp;colorscheme=light&amp;height=30" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:210px; height:30px;" allowTransparency="true"></iframe></div><a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="<?php echo SITE_NAME; ?>">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script></td></tr>
+                <td>
+					<span class="listing_title">
+						<a href="<?php echo htmlentities($e['url']); ?>" target="_blank"><?php echo $e['title']; ?></a>
+					</span>
+					<span class="listing_category">
+						<?php echo $e['cat_name']; ?>
+					</span>
+					<?php if(isset($_SESSION['access']) && ($_SESSION['access'] == 2 || $_SESSION['access'] == 3)) { ?>
+						<span class="admin_link"><a href="<?php echo SITE_URL . "/edit/p/" . $e['id'] ?>">edit</a></span>
+						<span class="admin_link"><a href="<?php echo SITE_URL . "/delete/p/" . $e['id'] ?>">delete</a></span>
+					<?php } ?>
+				</td>
+			</tr>
+            <tr>
+				<td colspan="5"></td>
+				<td>
+					<span class="listing_details">
+						submitted <?php echo time_since(strtotime($e['created'])); ?> by <a href="<?php echo SITE_URL; ?>/u/<?php echo $e['login']; ?>"><?php echo $e['login']; ?></a> (<?php echo $e['user_score'];?>)
+						| <span class="listing_domain"><?php echo $e['domain']; ?></span>
+						| <a href="#comment_start"><?php if($e['comment_count'] == 0) { echo "no comments"; } else { echo $e['comment_count'] . " comment" . (($e['comment_count'] > 1) ? "s" : ""); } ?></a>
+					</span>
+				</td>
+			</tr>
+            <tr>
+				<td colspan="5"></td>
+				<td style="padding-top:10px;">
+					<!-- Facebook -->
+					<div style="float:left;">
+						<iframe
+							src="http://www.facebook.com/plugins/like.php?href=<?php echo urlencode(SITE_URL); ?>%2Fv%2F<?php echo $e['slug']; ?>&amp;layout=standard&amp;show_faces=true&amp;width=210&amp;action=like&amp;font=verdana&amp;colorscheme=light&amp;height=30"
+							scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:210px; height:30px;" allowTransparency="true"></iframe>
+					</div>
+					
+					<!-- Twitter -->
+					<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="<?php echo SITE_NAME; ?>">Tweet</a>
+					<script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+				</td>
+			</tr>
 
 			<?php // detect embeds
 			
@@ -71,7 +113,13 @@ if(count($view) > 0) { ?>
 				preg_match('/[\\?\\&]v=([^\\?\\&]+)/',$e['url'],$matches);
 				if(count($matches) > 1) {
 					$embed = true;
-					$embed_code = "<object width='480' height='344'><param name='movie' value='http://www.youtube.com/v/" . $matches[1] . "?fs=1&amp;hl=en_US&amp;color1=FFFFFF&amp;color2=FFFFFF'></param><param name='allowFullScreen' value='true'></param><param name='allowscriptaccess' value='always'></param><embed src='http://www.youtube.com/v/" . $matches[1] . "?fs=1&amp;hl=en_US&amp;color1=FFFFFF&amp;color2=FFFFFF' type='application/x-shockwave-flash' allowscriptaccess='always' allowfullscreen='true' width='480' height='344'></embed></object>";
+					$embed_code =	"<object width='480' height='344'>
+										<param name='movie' value='http://www.youtube.com/v/" . $matches[1] . "?fs=1&amp;hl=en_US&amp;color1=FFFFFF&amp;color2=FFFFFF'></param>
+										<param name='allowFullScreen' value='true'></param>
+										<param name='allowscriptaccess' value='always'></param>
+										<embed src='http://www.youtube.com/v/" . $matches[1] . "?fs=1&amp;hl=en_US&amp;color1=FFFFFF&amp;color2=FFFFFF' type='application/x-shockwave-flash'
+											allowscriptaccess='always' allowfullscreen='true' width='480' height='344'></embed>
+									</object>";
 				}
 			}
 			// LIVELEAK
@@ -79,7 +127,13 @@ if(count($view) > 0) { ?>
 				preg_match('/[\\?\\&]i=([^\\?\\&]+)/',$e['url'],$matches);
 				if(count($matches) > 1) {
 					$embed = true;
-					$embed_code = "<object width='450' height='370'><param name='movie' value='http://www.liveleak.com/e/" . $matches[1] . "'></param><param name='wmode' value='transparent'></param><param name='allowscriptaccess' value='always'></param><embed src='http://www.liveleak.com/e/" . $matches[1] . "' type='application/x-shockwave-flash' wmode='transparent' allowscriptaccess='always' width='450' height='370'></embed></object>";
+					$embed_code =	"<object width='450' height='370'>
+										<param name='movie' value='http://www.liveleak.com/e/" . $matches[1] . "'></param>
+										<param name='wmode' value='transparent'></param>
+										<param name='allowscriptaccess' value='always'></param>
+										<embed src='http://www.liveleak.com/e/" . $matches[1] . "' type='application/x-shockwave-flash'
+											wmode='transparent' allowscriptaccess='always' width='450' height='370'></embed>
+									</object>";
 				}
 			}		
 			// GAMETRAILERS
@@ -87,7 +141,9 @@ if(count($view) > 0) { ?>
 				preg_match('/video\/(.+?)\/([0-9]{1,9})/',$e['url'],$matches);
 				if(count($matches) > 2) {
 					$embed = true;
-					$embed_code = "<embed width='640' height='391' src='http://media.mtvnservices.com/mgid:moses:video:gametrailers.com:" . $matches[2] . "' quality='high' bgcolor='000000' name='efp' align='middle' type='application/x-shockwave-flash'  pluginspage='http://www.macromedia.com/go/getflashplayer'  flashvars='autoPlay=false' allowfullscreen='true'></embed>";
+					$embed_code =	"<embed width='640' height='391' src='http://media.mtvnservices.com/mgid:moses:video:gametrailers.com:" . $matches[2] . "' quality='high'
+									bgcolor='000000' name='efp' align='middle' type='application/x-shockwave-flash' pluginspage='http://www.macromedia.com/go/getflashplayer'
+									flashvars='autoPlay=false' allowfullscreen='true'></embed>";
 				}
 			}
 			else $embed = false;
@@ -119,13 +175,19 @@ if(count($view) > 0) { ?>
                 $("a.edit_link").click(function(){
                     this_id = this.id;
                     comment_text = $("#comment_text" + this_id).text();
-                    $("#reply_link_div" + this_id).after('<div id="reply_div' + this_id + '" class="reply_div"><form method="post" action="<?php echo SITE_URL . "/comment"; ?>">'+
-                                                         '<input type="hidden" name="post_id" value="<?php echo $view[0]['id']; ?>" />'+
-                                                         '<input type="hidden" name="post_slug" value="<?php echo $view[0]['slug']; ?>" />'+
-                                                         '<input type="hidden" name="edit" value="' + this_id + '" />'+
-                                                         '<strong>edit</strong><div style="padding-bottom:4px;">'+
-                                                         '<textarea name="comment_input" id="comment_input' + this_id + '" rows="1" style="width:100%;" /></textarea>'+
-                                                         '</div><input type="submit" name="submit" value="submit" />&nbsp;&nbsp;&nbsp;<span class="admin_link"><input type="checkbox" name="delete" />&nbsp;delete</span>&nbsp;&nbsp;&nbsp;<a href="#" class="reply_cancel_link" id="' + this_id + '">cancel</a></form></div>');
+                    $("#reply_link_div" + this_id).after('<div id="reply_div' + this_id + '" class="reply_div">'+
+														 '	<form method="post" action="<?php echo SITE_URL . "/comment"; ?>">'+
+														 '		<input type="hidden" name="post_id" value="<?php echo $view[0]['id']; ?>" />'+
+														 '		<input type="hidden" name="post_slug" value="<?php echo $view[0]['slug']; ?>" />'+
+														 '		<input type="hidden" name="edit" value="' + this_id + '" />'+
+														 '		<strong>edit</strong>'+
+														 '		<div style="padding-bottom:4px;">'+
+														 '			<textarea name="comment_input" id="comment_input' + this_id + '" rows="1" style="width:100%;" /></textarea>'+
+														 '		</div>'+
+														 '		<input type="submit" name="submit" value="submit" />&nbsp;&nbsp;&nbsp;'+
+														 '		<span class="admin_link"><input type="checkbox" name="delete" />&nbsp;delete</span>'+
+														 '		&nbsp;&nbsp;&nbsp;<a href="#" class="reply_cancel_link" id="' + this_id + '">cancel</a></form>'+
+														 '</div>');
                     $("#comment_input" + this_id).val(comment_text);
                     $("#comment_input" + this_id).elastic();
                     $("#reply_link_div" + this_id).hide();
