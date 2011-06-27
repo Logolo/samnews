@@ -1,7 +1,24 @@
-<?php include('config.php');
+<?php /*====================================================================================
+		SamNews [http://samjlevy.com/samnews], open-source PHP social news application
+    	sam j levy [http://samjlevy.com]
+
+    	This program is free software: you can redistribute it and/or modify it under the
+    	terms of the GNU General Public License as published by the Free Software
+    	Foundation, either version 3 of the License, or (at your option) any later
+    	version.
+
+    	This program is distributed in the hope that it will be useful, but WITHOUT ANY
+    	WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+    	PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+
+    	You should have received a copy of the GNU General Public License along with this
+    	program.  If not, see <http://www.gnu.org/licenses/>.
+      ====================================================================================*/
+
+include('config.php');
 
 // query user information
-$user_result = samq("users","id,login,email,about,perm_mod,perm_admin,post_count,comment_count,vote_count,cookie_key,forgot_key",NULL,"login = '" . esc($_REQUEST['user']) . "'");
+$user_result = samq("users","id,login,email,about,perm_mod,perm_admin,post_count,comment_count,vote_count,forgot_key",NULL,"login = '" . esc($_GET['user']) . "'");
 
 // prevent unauthorized or mods editing mods/admins
 if( isset($_SESSION['access']) && (($_SESSION['access'] == 2 && $user_result[0]['perm_mod'] != 1 && $user_result[0]['perm_admin'] != 1) || $_SESSION['access'] == 3)) {
@@ -34,8 +51,7 @@ if( isset($_SESSION['access']) && (($_SESSION['access'] == 2 && $user_result[0][
 			}
 			$user_update .= " post_count = " . ((trim($_POST['post_count']) != "") ? esc($_POST['post_count']) : "0") . ",";
 			$user_update .= " comment_count = " . ((trim($_POST['comment_count']) != "") ? esc($_POST['comment_count']) : "0") . ",";
-			$user_update .= " vote_count = " . ((trim($_POST['vote_count']) != "") ? esc($_POST['vote_count']) : "0") . ",";
-			$user_update .= " cookie_key = " . ((trim($_POST['cookie_key']) != "") ? "'" . esc($_POST['cookie_key']) . "'" : "NULL");
+			$user_update .= " vote_count = " . ((trim($_POST['vote_count']) != "") ? esc($_POST['vote_count']) : "0");
 			
 			$user_update .= " WHERE id = " . $user_result[0]['id'];
 
@@ -65,9 +81,9 @@ if( isset($_SESSION['access']) && (($_SESSION['access'] == 2 && $user_result[0][
 	}
 
 	// echo success message
-	if(isset($success)) { echo "<br /><div class='success'>" . $success . "</div><br /><br /><a href='" . SITE_URL . "/u/" . $_REQUEST['user'] . "'>done</a>"; } else {
+	if(isset($success)) { echo "<br /><div class='success'>" . $success . "</div><br /><br /><a href='" . SITE_URL . "/u/" . htmlentities($_GET['user']) . "'>done</a>"; } else {
 	?>
-		<form method="post" action="<?php echo SITE_URL; ?>/edit/u/<?php echo $_REQUEST['user']; ?>">
+		<form method="post" action="<?php echo SITE_URL; ?>/edit/u/<?php echo $_GET['user']; ?>">
 		<?php foreach($user_result as $e) { ?>
 			<table class="admin_table" width="500">
                 <tr><td><strong>id</strong><br /><input type="text" name="id" style="width:98%;" value="<?php if(isset($e['id'])) echo trim($e['id']); ?>" disabled /></td></tr>
@@ -79,11 +95,12 @@ if( isset($_SESSION['access']) && (($_SESSION['access'] == 2 && $user_result[0][
                 <tr><td><strong>post count</strong><br /><input type="text" name="post_count" style="width:98%;" value="<?php if(isset($e['post_count'])) echo trim($e['post_count']); ?>" /></td></tr>
                 <tr><td><strong>comment count</strong><br /><input type="text" name="comment_count" style="width:98%;" value="<?php if(isset($e['comment_count'])) echo trim($e['comment_count']); ?>" /></td></tr>
                 <tr><td><strong>vote count</strong><br /><input type="text" name="vote_count" style="width:98%;" value="<?php if(isset($e['vote_count'])) echo trim($e['vote_count']); ?>" /></td></tr>
-				<tr><td><strong>cookie key</strong><br /><input type="text" name="cookie_key" style="width:98%;" value="<?php if(isset($e['cookie_key'])) echo trim($e['cookie_key']); ?>" /></td></tr>
 				<tr><td><strong>forgot key</strong><br /><input type="text" name="forgot_key" style="width:98%;" value="<?php if(isset($e['forgot_key'])) echo trim($e['forgot_key']); ?>" disabled /></td></tr>
 			</table>
 		<?php } ?>
 			<br />
+            <input type="button" value="cancel" onClick="location.href='<?php echo SITE_URL . "/ulist"; ?>'" />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 			<input type="submit" name="submit" value="submit" />
 		</form>
 	<?php } ?>
@@ -96,5 +113,6 @@ include('foot.php');
 
 } else {
 	header("Location: " . SITE_URL);
+	die();
 }
 ?>

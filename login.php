@@ -1,4 +1,21 @@
-<?php include('config.php');
+<?php /*====================================================================================
+		SamNews [http://samjlevy.com/samnews], open-source PHP social news application
+    	sam j levy [http://samjlevy.com]
+
+    	This program is free software: you can redistribute it and/or modify it under the
+    	terms of the GNU General Public License as published by the Free Software
+    	Foundation, either version 3 of the License, or (at your option) any later
+    	version.
+
+    	This program is distributed in the hope that it will be useful, but WITHOUT ANY
+    	WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+    	PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+
+    	You should have received a copy of the GNU General Public License along with this
+    	program.  If not, see <http://www.gnu.org/licenses/>.
+      ====================================================================================*/
+
+include('config.php');
 
 // securimage
 include_once CLASSES_PATH . 'securimage/securimage.php';
@@ -7,7 +24,7 @@ $securimage = new Securimage();
 include(INCLUDES_PATH . 'auth.php');
 
 // check to see if user is logging out
-if(isset($_REQUEST['out'])) {
+if(isset($_GET['out'])) {
 	logout();
 	$success = "logout successful";
 }
@@ -31,7 +48,7 @@ if(isset($_POST['user'])) {
 				if(isset($_POST['rememberme'])) {
 
 					// query cookie key
-					$cookie_result = samq("users","cookie_key",NULL,"id = " . $_SESSION['user_id']);
+					$cookie_result = samq("users","cookie_key",NULL,"id = " . esc($_SESSION['user_id']));
 					$cookie_key = $cookie_result[0]['cookie_key'];
 
 					// set cookies
@@ -40,10 +57,11 @@ if(isset($_POST['user'])) {
 				}
 				
 				// log IP address
-				samq_u("users",array("ip"),array(get_host($_SERVER['REMOTE_ADDR'])),"id = " . $_SESSION['user_id']);
+				samq_u("users",array("ip"),array(gethostbyaddr($_SERVER['REMOTE_ADDR'])),"id = " . esc($_SESSION['user_id']));
 				
 				// authentication passed
 				header("Location: " . SITE_URL);
+				die();
 			} else {
 				// authentication failed
 				$error = 1; $error_msg[] = "incorrect user name or password";

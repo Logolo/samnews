@@ -1,89 +1,147 @@
-<?php include('config.php');
+<?php /*====================================================================================
+		SamNews [http://samjlevy.com/samnews], open-source PHP social news application
+    	sam j levy [http://samjlevy.com]
+
+    	This program is free software: you can redistribute it and/or modify it under the
+    	terms of the GNU General Public License as published by the Free Software
+    	Foundation, either version 3 of the License, or (at your option) any later
+    	version.
+
+    	This program is distributed in the hope that it will be useful, but WITHOUT ANY
+    	WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+    	PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+
+    	You should have received a copy of the GNU General Public License along with this
+    	program.  If not, see <http://www.gnu.org/licenses/>.
+      ====================================================================================*/
+
+include('config.php');
 include(INCLUDES_PATH . "neat_trim.php");
 
+// compute url
+$url = SITE_URL;
+$feed_url = SITE_URL . "/rss";
+if(!isset($_GET['mode']) && isset($_GET['cat'])) {
+	$url .= "/cat/" . htmlentities($_GET['cat']);
+	$feed_url .= "/cat/" . htmlentities($_GET['cat']);
+}
+if(isset($_GET['mode'])) {
+	if($_GET['mode'] == "submit") {
+		$url .= "/submissions/" . htmlentities($_GET['user']);
+		$feed_url .= "/submissions/" . htmlentities($_GET['user']);
+	}
+	elseif($_GET['mode'] == "vote") {
+		$url .= "/voted/" . htmlentities($_GET['user']);
+		$feed_url .= "/voted/" . htmlentities($_GET['user']);
+	}
+	else {
+		$url .= "/" . htmlentities($_GET['mode']);
+		$feed_url .= "/" . htmlentities($_GET['mode']);
+	}
+	if(isset($_GET['cat'])) {
+		$url .= "/cat/" . htmlentities($_GET['cat']);
+		$feed_url .= "/cat/" . htmlentities($_GET['cat']);
+	}
+}
+
+$first_half = "SELECT post.id, title, users.id as author_id, slug, url, domain, description, post.comment_count, login, 
+				users.voted_count AS user_score, 
+				post.score AS post_score, 
+				post.created, 
+				category.name AS cat_name
+				FROM post 
+				INNER JOIN users ON author = users.id 
+				INNER JOIN category ON category = category.id";
+$first_half_count = "SELECT count(post.id) AS index_count FROM post INNER JOIN users ON author = users.id INNER JOIN category ON category = category.id";
+
 // find limit numbers
-if(!isset($_REQUEST['p'])) {
+if(!isset($_GET['p'])) {
 	$current_page = 1;
 	$start = 0;
 } else {
-	$current_page = $_REQUEST['p'];
+	$current_page = $_GET['p'];
 	$start = ($current_page - 1) * INDEX_DISPLAY;
 }
 $end = INDEX_DISPLAY;
 
-if(isset($_REQUEST['mode'])) {
+if(isset($_GET['mode'])) {
 
-	if($_REQUEST['mode'] == "all-time") {
+	if($_GET['mode'] == "all-time") {
 	// all-time
 	
 		// count records
-		$index_count_result = samq_c("SELECT count(post.id) AS index_count FROM post INNER JOIN users ON author = users.id ORDER BY score DESC, post.created DESC",1);
+		$index_count_result = samq_c($first_half_count . (isset($_GET['cat']) ? " WHERE category.name = '" . esc($_GET['cat']) . "'" : "") . " ORDER BY score DESC, post.created DESC",1);
 
 		// get records
-		$index = samq_c("SELECT post.id, title, users.id as author_id, slug, url, domain, description, post.comment_count, login, users.voted_count AS user_score, post.score AS post_score, post.created FROM post INNER JOIN users ON author = users.id ORDER BY score DESC, post.created DESC	LIMIT " . $start . ", " . $end,1);
+		$index = samq_c($first_half . (isset($_GET['cat']) ? " WHERE category.name = '" . esc($_GET['cat']) . "'" : "") . " ORDER BY score DESC, post.created DESC	LIMIT " . esc($start) . ", " . esc($end),1);
 		
 		// set page head
 		$page_head = "all-time";
 
-	} elseif($_REQUEST['mode'] == "new") {
+	} elseif($_GET['mode'] == "new") {
 	// new
 		// count records
-		$index_count_result = samq_c("SELECT count(post.id) AS index_count FROM post INNER JOIN users ON author = users.id ORDER BY post.created DESC",1);
+		$index_count_result = samq_c($first_half_count . (isset($_GET['cat']) ? " WHERE category.name = '" . esc($_GET['cat']) . "'" : "") . " ORDER BY post.created DESC",1);
 
 		// get records
-		$index = samq_c("SELECT post.id, title, users.id as author_id, slug, url, domain, description, post.comment_count, login, users.voted_count AS user_score, post.score AS post_score, post.created FROM post INNER JOIN users ON author = users.id ORDER BY post.created DESC LIMIT " . $start . ", " . $end,1);
+		$index = samq_c($first_half . (isset($_GET['cat']) ? " WHERE category.name = '" . esc($_GET['cat']) . "'" : "") . " ORDER BY post.created DESC LIMIT " . esc($start) . ", " . esc($end),1);
 		
 		// set page head
 		$page_head = "newest";
-	} elseif($_REQUEST['mode'] == "submit" && isset($_REQUEST['user'])) {
+	} elseif($_GET['mode'] == "submit" && isset($_GET['user'])) {
 	// user submissions
 		// count records
-		$index_count_result = samq_c("SELECT count(post.id) AS index_count FROM post INNER JOIN users ON author = users.id WHERE login = '" . esc($_REQUEST['user']) . "' ORDER BY post.created DESC",1);
+		$index_count_result = samq_c($first_half_count . " WHERE login = '" . esc($_GET['user']) . "'" . (isset($_GET['cat']) ? " AND category.name = '" . esc($_GET['cat']) . "'" : "") . " ORDER BY post.created DESC",1);
 
 		// get records
-		$index = samq_c("SELECT post.id, title, users.id as author_id, slug, url, domain, description, post.comment_count, login, users.voted_count AS user_score, post.score AS post_score, post.created FROM post INNER JOIN users ON author = users.id WHERE login = '" . esc($_REQUEST['user']) . "'" . "ORDER BY post.created DESC LIMIT " . $start . ", " . $end,1);
+		$index = samq_c($first_half . " WHERE login = '" . esc($_GET['user']) . "'" . (isset($_GET['cat']) ? " AND category.name = '" . esc($_GET['cat']) . "'" : "") . " ORDER BY post.created DESC LIMIT " . esc($start) . ", " . esc($end),1);
 		
 		// set page head
-		$page_head = trim($_REQUEST['user']) . "'s submissions";
-	} elseif($_REQUEST['mode'] == "vote" && isset($_REQUEST['user'])) {
+		$page_head = trim($_GET['user']) . "'s submissions";
+	} elseif($_GET['mode'] == "vote" && isset($_GET['user'])) {
 	// user voted
 		// query user_id
-		$vote_userid = samq("users","id",NULL,"login = '" . esc($_REQUEST['user']) . "'");
+		$vote_userid = samq("users","id",NULL,"login = '" . esc($_GET['user']) . "'");
 
 		// count records
-		$index_count_result = samq_c("SELECT count(post.id) AS index_count FROM post INNER JOIN users ON author = users.id INNER JOIN vote_post ON post.id = vote_post.post WHERE vote_post.userid = " . $vote_userid[0]['id'] . " ORDER BY post.created DESC",1);
+		$index_count_result = samq_c($first_half_count . " INNER JOIN vote_post ON post.id = vote_post.post WHERE vote_post.userid = " . $vote_userid[0]['id'] . (isset($_GET['cat']) ? " AND category.name = '" . esc($_GET['cat']) . "'" . "'" : "") . " ORDER BY post.created DESC",1);
 
 		// get records
-		$index = samq_c("SELECT post.id, title, users.id as author_id, slug, url, domain, description, post.comment_count, login, users.voted_count AS user_score, post.score AS post_score, post.created FROM post INNER JOIN users ON author = users.id INNER JOIN vote_post ON post.id = vote_post.post WHERE vote_post.userid = " . $vote_userid[0]['id'] . " ORDER BY post.created DESC LIMIT " . $start . ", " . $end,1);
+		$index = samq_c($first_half . " INNER JOIN vote_post ON post.id = vote_post.post WHERE vote_post.userid = " . $vote_userid[0]['id'] . (isset($_GET['cat']) ? " AND category.name = '" . esc($_GET['cat']) . "'" : "") . " ORDER BY post.created DESC LIMIT " . esc($start) . ", " . esc($end),1);
 
 		// set page head
-		$page_head = trim($_REQUEST['user']) . "'s voted";
+		$page_head = trim($_GET['user']) . "'s voted";
 	}
 } else {
 	// regular
 		// count records
-		$index_count_result = samq_c("SELECT count(post.id) AS index_count FROM post INNER JOIN users ON author = users.id WHERE post.created >= DATE_SUB(NOW(),INTERVAL 5 day) ORDER BY score DESC, post.created DESC",1);
+		$index_count_result = samq_c($first_half_count . (isset($_GET['cat']) ? " WHERE category.name = '" . esc($_GET['cat']) . "'" : "") . " ORDER BY CASE WHEN post.created >= DATE_SUB(NOW(),INTERVAL " . INDEX_INTERVAL . ") THEN post.score END DESC, post.created DESC",1);
 	
 		// get records
-		$index = samq_c("SELECT post.id, title, users.id AS author_id, slug, url, domain, description, post.comment_count, login, users.voted_count AS user_score, post.score AS post_score, post.created FROM post INNER JOIN users ON author = users.id WHERE post.created >= DATE_SUB(NOW(),INTERVAL " . INDEX_INTERVAL . ") ORDER BY score DESC, post.created DESC LIMIT " . $start . ", " . $end,1);
+		$index = samq_c($first_half . (isset($_GET['cat']) ? " WHERE category.name = '" . esc($_GET['cat']) . "'" : "") . " ORDER BY CASE WHEN post.created >= DATE_SUB(NOW(),INTERVAL " . INDEX_INTERVAL . ") THEN post.score END DESC, post.created DESC LIMIT " . esc($start) . ", " . esc($end),1);
 }
 
 include('head.php');
 
-if(count($index) > 0) {
+if(isset($page_head) || isset($_GET['cat'])) {
+	if(isset($_GET['cat'])) {
+		if(!isset($page_head)) $page_head = "";
+		$page_head .= " " . htmlentities($_GET['cat']);
+	} ?>  
+	<br /><div class="content">
+	<span class="page_title"><?php echo $page_head; ?></span><br />
+	</div>
+<?php } ?>
+
+<?php if(count($index) > 0) {
 
 	// calculate total number of pages
 	$index_count = $index_count_result[0]['index_count'];
 	$pages = intval($index_count/INDEX_DISPLAY);
-	if($index_count % INDEX_DISPLAY) $pages++; // add page if remainder
-
-	if(isset($page_head)) { ?>
-    <br /><div class="content">
-    <span class="page_title"><?php echo $page_head; ?></span><br />
-    </div><?php } ?>
+	if($index_count % INDEX_DISPLAY) $pages++; // add page if remainder ?>
 
 <!--sphider_noindex-->
-
+    
     <table class="listing_table">
         <tr class="listing_spacer_tr"><td colspan="6"></td></tr>
     
@@ -119,7 +177,7 @@ if(count($index) > 0) {
                         <img src="<?php echo IMAGES_PATH; ?>up_voted.gif" alt="voted up" />
                     </span>
                 </td>
-                <td><span class="listing_title"><a href="<?php echo htmlentities($e['url']); ?>" target="_blank"<?php if(isset($e['description'])) { ?> class="tooltip" title="<?php echo htmlspecialchars(neat_trim($e['description'],300), ENT_QUOTES); ?>"<?php } ?>><?php echo $e['title']; ?></a></span></td></tr>
+                <td><span class="listing_title"><a href="<?php echo htmlentities($e['url']); ?>" target="_blank"<?php if(isset($e['description'])) { ?> class="tooltip" title="<?php echo htmlspecialchars(neat_trim($e['description'],300), ENT_QUOTES); ?>"<?php } ?>><?php echo $e['title']; ?></a></span><span class="listing_category"><?php echo $e['cat_name']; ?></span></td></tr>
                 <tr><td colspan="5"></td><td><span class="listing_details">
                 submitted <?php echo time_since(strtotime($e['created'])); ?> by <a href="<?php echo SITE_URL; ?>/u/<?php echo $e['login']; ?>"><?php echo $e['login']; ?></a>(<?php echo $e['user_score']; ?>) | <span class="listing_domain"><?php echo $e['domain']; ?></span> | <a href="<?php echo SITE_URL; ?>/v/<?php echo $e['slug']; ?>"><?php if($e['comment_count'] == 0) { echo "no comments"; } else { echo $e['comment_count'] . " comment" . (($e['comment_count'] > 1) ? "s" : ""); } ?></a></span></td></tr>
 
@@ -128,9 +186,7 @@ if(count($index) > 0) {
         
         <?php if($pages > 1) { ?>
         <tr><td colspan="5"></td><td><span class="listing_title">
-			<?php // compute url
-			if(!isset($_REQUEST['mode'])) { $url = SITE_URL; } elseif($_REQUEST['mode'] == "submit") { $url = SITE_URL . "/submissions/" . $_REQUEST['user']; } else { $url = SITE_URL . "/" . $_REQUEST['mode']; }
-
+			<?php
             // previous link
 			if($current_page != 1) {
 				echo "<a href='";

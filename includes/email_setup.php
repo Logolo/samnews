@@ -1,13 +1,32 @@
-<?php
+<?php /*====================================================================================
+		SamNews [http://samjlevy.com/samnews], open-source PHP social news application
+    	sam j levy [http://samjlevy.com]
+
+    	This program is free software: you can redistribute it and/or modify it under the
+    	terms of the GNU General Public License as published by the Free Software
+    	Foundation, either version 3 of the License, or (at your option) any later
+    	version.
+
+    	This program is distributed in the hope that it will be useful, but WITHOUT ANY
+    	WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+    	PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+
+    	You should have received a copy of the GNU General Public License along with this
+    	program.  If not, see <http://www.gnu.org/licenses/>.
+      ====================================================================================*/
+
 require_once(CLASSES_PATH . 'phpmailer/class.phpmailer.php');
 $mail = new PHPMailer();
-$mail->IsSMTP();
-$mail->SMTPDebug  = 1;
+
+/* uncomment if you want to use SMTP
+$mail->IsSMTP();     
 $mail->SMTPAuth   = true;
-$mail->Host       = "localhost";
+$mail->Host       = "";
 $mail->Port       = 25;
-$mail->Username   = "noreply@yoursite.com";
-$mail->Password   = "smtppassword";
-$mail->SetFrom('noreply@yoursite.com', 'yourname');
-$mail->AddReplyTo('noreply@yoursite.com','yourname');
+$mail->Username   = "";
+$mail->Password   = "";
+*/
+
+$mail->SetFrom(OUTGOING_EMAIL,SITE_NAME);
+$mail->AddReplyTo(OUTGOING_EMAIL,SITE_NAME);
 ?>

@@ -1,4 +1,19 @@
-<?php
+<?php /*====================================================================================
+		SamNews [http://samjlevy.com/samnews], open-source PHP social news application
+    	sam j levy [http://samjlevy.com]
+
+    	This program is free software: you can redistribute it and/or modify it under the
+    	terms of the GNU General Public License as published by the Free Software
+    	Foundation, either version 3 of the License, or (at your option) any later
+    	version.
+
+    	This program is distributed in the hope that it will be useful, but WITHOUT ANY
+    	WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+    	PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+
+    	You should have received a copy of the GNU General Public License along with this
+    	program.  If not, see <http://www.gnu.org/licenses/>.
+      ====================================================================================*/
 
 // establish connection
 mysql_connect(DB_HOST, DB_USER, DB_PASSWORD) or die ("Error connecting to database");
@@ -9,7 +24,7 @@ if(isset($_SESSION['user'])) { $user_error_name = $_SESSION['user']; } else { $u
 
 // escape characters for sql
 function esc($value) {
-	if(get_magic_quotes_gpc()) $str = stripslashes($value);
+	if(get_magic_quotes_gpc()) $str = stripslashes($value); else $str = $value;
 	
 	// replace special characters
 	$str = replace_schars($str);
@@ -60,9 +75,9 @@ function samq_i($table, $columns, $values) {
 	$i = 1;
 	foreach($values as $x) {
 		if(is_null($x)) { $q.= "NULL"; } else {
-			if(!is_numeric(trim($x))) $q.= "'";
-			$q.= esc($x);
-			if(!is_numeric(trim($x))) $q.= "'";
+            if ( !ctype_digit(trim($x)) || (strlen(trim($x)) > 1 && substr(trim($x),0,1) == 0) ) $q.= "'";
+            $q.= esc($x);
+            if ( !ctype_digit(trim($x)) || (strlen(trim($x)) > 1 && substr(trim($x),0,1) == 0) ) $q.= "'";
 		}
 		if($i != $count) $q.= ",";
 		$i++;
@@ -89,9 +104,9 @@ function samq_u($table, $columns, $values, $where=NULL) {
 		$q.= " " . esc($column) . " = ";
 		
 		if(is_null($value)) { $q.= "NULL"; } else {
-			if(!is_numeric(trim($value))) $q.= "'";
-			$q.= esc($value);
-			if(!is_numeric(trim($value))) $q.= "'";
+            if ( !ctype_digit(trim($value)) || (strlen(trim($value)) > 1 && substr(trim($value),0,1) == 0) ) $q.= "'";
+            $q.= esc($value);
+            if ( !ctype_digit(trim($value)) || (strlen(trim($value)) > 1 && substr(trim($value),0,1) == 0) ) $q.= "'";
 		}
 		if($i != $count) $q.= ",";
 		$i++;

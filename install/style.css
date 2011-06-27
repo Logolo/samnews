@@ -1,0 +1,54 @@
+/* links */
+	a:link {
+		color: #b755ba;
+		text-decoration: none;
+	}
+	a:visited {
+		text-decoration: none;
+		color: #b755ba;
+	}
+	a:hover {
+		text-decoration: none;
+		color: #7b7bff;
+	}
+	a:active {
+		text-decoration: none;
+		color: #b755ba;
+	}
+
+/* body */
+	body {
+		font-family:Verdana, Arial, Helvetica, sans-serif;
+		font-size:13px;
+		margin:20px;
+	}
+
+	.install_head {
+		font-size:40px;
+		margin-bottom:15px;
+	}
+
+	.step_head {
+		font-size:18px;
+		font-weight:bold;
+		margin-bottom:15px;
+	}
+
+	.error {
+		color:red;
+		padding-bottom:10px;
+	}
+
+	.success {
+		color:green;
+		padding-bottom:10px;
+	}
+
+	table {
+		border-collapse:collapse;
+		border:1px solid black;
+	}
+	table td {
+		border:1px dashed #d1d1d1;
+		padding:5px;
+	}

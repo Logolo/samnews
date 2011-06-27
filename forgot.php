@@ -1,4 +1,21 @@
-<?php include('config.php');
+<?php /*====================================================================================
+		SamNews [http://samjlevy.com/samnews], open-source PHP social news application
+    	sam j levy [http://samjlevy.com]
+
+    	This program is free software: you can redistribute it and/or modify it under the
+    	terms of the GNU General Public License as published by the Free Software
+    	Foundation, either version 3 of the License, or (at your option) any later
+    	version.
+
+    	This program is distributed in the hope that it will be useful, but WITHOUT ANY
+    	WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+    	PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+
+    	You should have received a copy of the GNU General Public License along with this
+    	program.  If not, see <http://www.gnu.org/licenses/>.
+      ====================================================================================*/
+
+include('config.php');
 
 include_once CLASSES_PATH . 'securimage/securimage.php';
 $securimage = new Securimage();
@@ -32,19 +49,24 @@ if(isset($_POST['user_send'])) {
 				// passed check, execute update
 				samq_u("users",array("forgot_key"),array($forgot_key),"login = '" . $name_check[0]['login'] . "'");
 
-				// include email setup
+				// send forgot password e-mail
 				include(INCLUDES_PATH . 'email_setup.php');
-	
-				// send registration e-mail
-				$message  = "<html><head><title>" . SITE_NAME . " forgot password</title></head><body>";
-				$message  = "<p style='font-family:Verdana;font-size:24px;font-weight:bold;'>" . SITE_NAME . "</p>";
-				$message .= "<p style='font-family:Verdana;font-size:12px;'>" . str_replace('.','_',get_host($_SERVER['REMOTE_ADDR'])) . " has initiated a password reset for your account.</p>";
-				$message .= "<br /><p style='font-family:Verdana;font-size:12px;'>Click the link below to continue:<br /><a href='" . SITE_URL . "/reset/forgot/?user=" . trim($name_check[0]['login']) . "&key=" . $forgot_key . "' target='_blank'>" . SITE_URL . "/reset/forgot/?user=" . trim($name_check[0]['login']) . "&key=" . $forgot_key . "</a></p>";
-				$message .= "<br /><p style='font-family:Verdana;font-size:12px;'>If you did not make this request, please contact <a href='mailto:" . DEVELOPER_EMAIL . "'>" . DEVELOPER_EMAIL . "</a> for assistance</p>";
-				$message .= "</body></html>";
-				$mail->Subject = SITE_NAME . " forgot password";
-				$mail->MsgHTML($message);
 				$mail->AddAddress(trim($name_check[0]['email']));
+                $mail->Subject = SITE_NAME . " forgot password";
+
+				$message  = "<html><head><title>" . SITE_NAME . " forgot password</title></head><body>";
+				$message .= "<p style='font-family:Verdana;font-size:24px;font-weight:bold;'>" . SITE_NAME . "</p>";
+				$message .= "<p style='font-family:Verdana;font-size:12px;'>" . str_replace('.','_',gethostbyaddr($_SERVER['REMOTE_ADDR'])) . " has initiated a password reset for your account.</p>";
+				$message .= "<br /><p style='font-family:Verdana;font-size:12px;'>Click the link below to continue:<br /><a href='" . SITE_URL . "/reset/forgot/" . trim($name_check[0]['login']) . "/" . $forgot_key . "' target='_blank'>" . SITE_URL . "/reset/forgot/" . trim($name_check[0]['login']) . "/" . $forgot_key . "</a></p>";
+				$message .= "<br /><p style='font-family:Verdana;font-size:12px;'>If you did not make this request, please contact <a href='mailto:" . SUPPORT_EMAIL . "'>" . SUPPORT_EMAIL . "</a> for assistance</p>";
+				$message .= "</body></html>";
+				$mail->MsgHTML($message);
+
+				$altbody = str_replace("</title>","\n\n",$message);
+				$altbody = str_replace("</p>","\n\n",$altbody);
+				$altbody = str_replace("<br />","\n",$altbody);
+				$mail->AltBody = strip_tags($altbody);
+
 				if(!$mail->Send()) {
 					echo "Error sending forgot password email: " . $mail->ErrorInfo;
 				}

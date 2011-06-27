@@ -1,8 +1,26 @@
-<?php include('config.php');
+<?php /*====================================================================================
+		SamNews [http://samjlevy.com/samnews], open-source PHP social news application
+    	sam j levy [http://samjlevy.com]
 
-$view = samq_c("SELECT post.id, users.id AS author_id, title, slug, url, description, domain, post.comment_count, login, users.voted_count AS user_score, post.score AS post_score, post.created FROM post
+    	This program is free software: you can redistribute it and/or modify it under the
+    	terms of the GNU General Public License as published by the Free Software
+    	Foundation, either version 3 of the License, or (at your option) any later
+    	version.
+
+    	This program is distributed in the hope that it will be useful, but WITHOUT ANY
+    	WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+    	PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+
+    	You should have received a copy of the GNU General Public License along with this
+    	program.  If not, see <http://www.gnu.org/licenses/>.
+      ====================================================================================*/
+
+include('config.php');
+
+$view = samq_c("SELECT post.id, users.id AS author_id, title, slug, url, description, domain, post.comment_count, login, users.voted_count AS user_score, post.score AS post_score, post.created, category.name AS cat_name FROM post
 				INNER JOIN users ON author = users.id
-				WHERE slug = '" . $_REQUEST['post'] . "'",1);
+				INNER JOIN category ON category = category.id
+				WHERE slug = '" . esc($_GET['post']) . "'",1);
 
 include(INCLUDES_PATH . 'make_clickable.php');
 include('head.php');
@@ -42,21 +60,44 @@ if(count($view) > 0) { ?>
                         <img src="<?php echo IMAGES_PATH; ?>up_voted.gif" alt="voted up" />
                     </span>
                 </td>
-                <td><span class="listing_title"><a href="<?php echo htmlentities($e['url']); ?>" target="_blank"><?php echo $e['title']; ?></a></span></td></tr>
-            <tr><td colspan="5"></td><td><span class="listing_details">submitted <?php echo time_since(strtotime($e['created'])); ?> by <a href="<?php echo SITE_URL; ?>/u/<?php echo $e['login']; ?>"><?php echo $e['login']; ?></a>(<?php echo $e['user_score'];?>) | <span class="listing_domain"><?php echo $e['domain']; ?></span> | <a href="#comment_start"><?php if($e['comment_count'] == 0) { echo "no comments"; } else { echo $e['comment_count'] . " comment" . (($e['comment_count'] > 1) ? "s" : ""); } ?></a> <?php if(isset($_SESSION['access']) && ($_SESSION['access'] == 2 || $_SESSION['access'] == 3)) { ?> <span class="admin_link"><a href="<?php echo SITE_URL . "/edit/p/" . $e['id'] ?>">edit</a></span> <span class="admin_link"><a href="<?php echo SITE_URL . "/delete/p/" . $e['id'] ?>">delete</a></span><?php } ?></span></td></tr>
+                <td><span class="listing_title"><a href="<?php echo htmlentities($e['url']); ?>" target="_blank"><?php echo $e['title']; ?></a></span><span class="listing_category"><?php echo $e['cat_name']; ?></span> <?php if(isset($_SESSION['access']) && ($_SESSION['access'] == 2 || $_SESSION['access'] == 3)) { ?> <span class="admin_link"><a href="<?php echo SITE_URL . "/edit/p/" . $e['id'] ?>">edit</a></span> <span class="admin_link"><a href="<?php echo SITE_URL . "/delete/p/" . $e['id'] ?>">delete</a></span><?php } ?></span></td></tr>
+            <tr><td colspan="5"></td><td><span class="listing_details">submitted <?php echo time_since(strtotime($e['created'])); ?> by <a href="<?php echo SITE_URL; ?>/u/<?php echo $e['login']; ?>"><?php echo $e['login']; ?></a>(<?php echo $e['user_score'];?>) | <span class="listing_domain"><?php echo $e['domain']; ?></span> | <a href="#comment_start"><?php if($e['comment_count'] == 0) { echo "no comments"; } else { echo $e['comment_count'] . " comment" . (($e['comment_count'] > 1) ? "s" : ""); } ?></a></td></tr>
             <tr><td colspan="5"></td><td style="padding-top:10px;"><div style="float:left;"><iframe src="http://www.facebook.com/plugins/like.php?href=<?php echo urlencode(SITE_URL); ?>%2Fv%2F<?php echo $e['slug']; ?>&amp;layout=standard&amp;show_faces=true&amp;width=210&amp;action=like&amp;font=verdana&amp;colorscheme=light&amp;height=30" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:210px; height:30px;" allowTransparency="true"></iframe></div><a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="<?php echo SITE_NAME; ?>">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script></td></tr>
-            <?php if(isset($e['description']) || $e['domain'] == "youtube.com") { ?>
+
+			<?php // detect embeds
+			
+			// YOUTUBE
+			if($e['domain'] == "youtube.com") {
+				preg_match('/[\\?\\&]v=([^\\?\\&]+)/',$e['url'],$matches);
+				if(count($matches) > 1) {
+					$embed = true;
+					$embed_code = "<object width='480' height='344'><param name='movie' value='http://www.youtube.com/v/" . $matches[1] . "?fs=1&amp;hl=en_US&amp;color1=FFFFFF&amp;color2=FFFFFF'></param><param name='allowFullScreen' value='true'></param><param name='allowscriptaccess' value='always'></param><embed src='http://www.youtube.com/v/" . $matches[1] . "?fs=1&amp;hl=en_US&amp;color1=FFFFFF&amp;color2=FFFFFF' type='application/x-shockwave-flash' allowscriptaccess='always' allowfullscreen='true' width='480' height='344'></embed></object>";
+				}
+			}
+			// LIVELEAK
+			elseif($e['domain'] == "liveleak.com") {
+				preg_match('/[\\?\\&]i=([^\\?\\&]+)/',$e['url'],$matches);
+				if(count($matches) > 1) {
+					$embed = true;
+					$embed_code = "<object width='450' height='370'><param name='movie' value='http://www.liveleak.com/e/" . $matches[1] . "'></param><param name='wmode' value='transparent'></param><param name='allowscriptaccess' value='always'></param><embed src='http://www.liveleak.com/e/" . $matches[1] . "' type='application/x-shockwave-flash' wmode='transparent' allowscriptaccess='always' width='450' height='370'></embed></object>";
+				}
+			}		
+			// GAMETRAILERS
+			elseif($e['domain'] == "gametrailers.com") {
+				preg_match('/video\/(.+?)\/([0-9]{1,9})/',$e['url'],$matches);
+				if(count($matches) > 2) {
+					$embed = true;
+					$embed_code = "<embed width='640' height='391' src='http://media.mtvnservices.com/mgid:moses:video:gametrailers.com:" . $matches[2] . "' quality='high' bgcolor='000000' name='efp' align='middle' type='application/x-shockwave-flash'  pluginspage='http://www.macromedia.com/go/getflashplayer'  flashvars='autoPlay=false' allowfullscreen='true'></embed>";
+				}
+			}
+			else $embed = false;
+
+			if(isset($e['description']) || $embed == true) { ?>
                 <tr class="listing_spacer_tr"><td colspan="6"></td></tr>
                 <tr><td colspan="5"></td><td>
-                <?php // AUTOMATIC YOUTUBE EMBEDS
-                    if($e['domain'] == "youtube.com") {
-                    // extract video number	
-                    preg_match('/[\\?\\&]v=([^\\?\\&]+)/',$e['url'],$matches);
-                    $youtube_id = $matches[1]; ?>
-                    <object width="480" height="344"><param name="movie" value="http://www.youtube.com/v/<?php echo $youtube_id; ?>?fs=1&amp;hl=en_US&amp;color1=FFFFFF&amp;color2=FFFFFF"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/<?php echo $youtube_id; ?>?fs=1&amp;hl=en_US&amp;color1=FFFFFF&amp;color2=FFFFFF" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="480" height="344"></embed></object>
-                    <br /><br />
-                <?php }
-                // DESCRIPTION
+                <?php if($embed) echo $embed_code . "<br /><br />"; ?>
+
+                <?php // DESCRIPTION
                 if(isset($e['description'])) { ?>
                 <div class="view_description"><?php echo make_clickable(nl2br($e['description'])); ?></div>
                 <?php }
@@ -69,7 +110,7 @@ if(count($view) > 0) { ?>
 			<?php // comment form
             if(isset($_SESSION['user'])) { ?>
             <script type="text/javascript">
-            $(function() {
+            jQuery(function() {
                 <!-- jQuery autoresize comment textarea -->
                 $("#comment_input").elastic();
     
@@ -128,7 +169,7 @@ if(count($view) > 0) { ?>
                 <?php if(isset($_SESSION['user'])) { ?>
                     <form method="post" action="<?php echo SITE_URL . "/comment"; ?>">
                     <input type="hidden" name="post_id" value="<?php echo $view[0]['id']; ?>" />
-                    <input type="hidden" name="post_slug" value="<?php echo $_REQUEST['post']; ?>" />
+                    <input type="hidden" name="post_slug" value="<?php echo $_GET['post']; ?>" />
                     <strong>comment</strong><div style="padding-bottom:4px;"><textarea name="comment_input" id="comment_input" rows="1" style="width:600px;" /></textarea></div><input type="submit" name="submit" value="submit" />
                     </form>
                 <?php } else { ?>

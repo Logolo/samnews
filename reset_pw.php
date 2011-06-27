@@ -1,4 +1,21 @@
-<?php include('config.php');
+<?php /*====================================================================================
+		SamNews [http://samjlevy.com/samnews], open-source PHP social news application
+    	sam j levy [http://samjlevy.com]
+
+    	This program is free software: you can redistribute it and/or modify it under the
+    	terms of the GNU General Public License as published by the Free Software
+    	Foundation, either version 3 of the License, or (at your option) any later
+    	version.
+
+    	This program is distributed in the hope that it will be useful, but WITHOUT ANY
+    	WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+    	PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+
+    	You should have received a copy of the GNU General Public License along with this
+    	program.  If not, see <http://www.gnu.org/licenses/>.
+      ====================================================================================*/
+
+include('config.php');
 
 if(isset($_SESSION['user_id'])) {
 	
@@ -23,18 +40,23 @@ if(isset($_SESSION['user_id'])) {
 			// get user's email address
 			$email_result = samq("users","email",NULL,"id = " . esc($_SESSION['user_id']));
 	
-			// include email setup
+			// send reset email
 			include(INCLUDES_PATH . 'email_setup.php');
-	
-			// send registration e-mail
+			$mail->AddAddress(trim($email_result[0]['email']));
+			$mail->Subject = SITE_NAME . " password has been reset";
+
 			$message  = "<html><head><title>" . SITE_NAME . " password reset</title></head><body>";
-			$message  = "<p style='font-family:Verdana;font-size:24px;font-weight:bold;'>" . SITE_NAME . "</p>";
-			$message .= "<p style='font-family:Verdana;font-size:12px;'>You have successfully reset your password at <a href='" . SITE_URL . "' target='_blank'>" . SITE_NAME . "</a></p>";
+			$message .= "<p style='font-family:Verdana;font-size:24px;font-weight:bold;'>" . SITE_NAME . "</p>";
+			$message .= "<p style='font-family:Verdana;font-size:12px;'>You have successfully reset your password at <a href='" . SITE_URL . "' target='_blank'>" . SITE_URL . "</a></p>";
 			$message .= "<p style='font-family:Verdana;font-size:12px;'>";
 			$message .= "<strong>user:</strong> " . esc($_SESSION['user']) . "<br /><strong>new password:</strong> " . esc($_POST['new_password']) . "</p></body></html>";
-			$mail->Subject = SITE_NAME . " password has been reset";
 			$mail->MsgHTML($message);
-			$mail->AddAddress(trim($email_result[0]['email']));
+
+			$altbody = str_replace("</title>","\n\n",$message);
+			$altbody = str_replace("</p>","\n\n",$altbody);
+			$altbody = str_replace("<br />","\n",$altbody);
+			$mail->AltBody = strip_tags($altbody);
+
 			if(!$mail->Send()) {
 				echo "Error sending password reset email: " . $mail->ErrorInfo;
 			}
@@ -93,5 +115,6 @@ include('foot.php');
 
 } else {
 	header("Location: " . SITE_URL);
+	die();
 }
 ?>

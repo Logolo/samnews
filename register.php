@@ -1,4 +1,21 @@
-<?php include('config.php');
+<?php /*====================================================================================
+		SamNews [http://samjlevy.com/samnews], open-source PHP social news application
+    	sam j levy [http://samjlevy.com]
+
+    	This program is free software: you can redistribute it and/or modify it under the
+    	terms of the GNU General Public License as published by the Free Software
+    	Foundation, either version 3 of the License, or (at your option) any later
+    	version.
+
+    	This program is distributed in the hope that it will be useful, but WITHOUT ANY
+    	WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+    	PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+
+    	You should have received a copy of the GNU General Public License along with this
+    	program.  If not, see <http://www.gnu.org/licenses/>.
+      ====================================================================================*/
+
+include('config.php');
 
 include_once CLASSES_PATH . 'securimage/securimage.php';
 $securimage = new Securimage();
@@ -42,20 +59,25 @@ if(isset($_POST['user'])) {
 			
 			if($error == 0) {
 				// passed check, execute insert
-				samq_i("users",array("login","password","email","cookie_key","created"),array($_POST['user'],sha1($_POST['password']),$_POST['email'],sha1($_POST['user'] . $_POST['password'] . get_host($_SERVER['REMOTE_ADDR'])),DATETIME_NOW));
-	
-				// include email setup
-				include(INCLUDES_PATH . 'email_setup.php');
+				samq_i("users",array("login","password","email","cookie_key","created"),array($_POST['user'],sha1($_POST['password']),$_POST['email'],sha1($_POST['user'] . $_POST['password'] . gethostbyaddr($_SERVER['REMOTE_ADDR'])),DATETIME_NOW));
 	
 				// send registration e-mail
+				include(INCLUDES_PATH . 'email_setup.php');
+				$mail->AddAddress(trim($_POST['email']));
+				$mail->Subject = SITE_NAME . " account";
+
 				$message  = "<html><head><title>" . SITE_NAME . " account</title></head><body>";
-				$message  = "<p style='font-family:Verdana;font-size:24px;font-weight:bold;'>" . SITE_NAME . "</p>";
-				$message .= "<p style='font-family:Verdana;font-size:12px;'>You have successfully registered for an account at <a href='" . SITE_URL . "' target='_blank'>" . SITE_NAME . "</a></p>";
+				$message .= "<p style='font-family:Verdana;font-size:24px;font-weight:bold;'>" . SITE_NAME . "</p>";
+				$message .= "<p style='font-family:Verdana;font-size:12px;'>You have successfully registered for an account at <a href='" . SITE_URL . "' target='_blank'>" . SITE_URL . "</a></p>";
 				$message .= "<p style='font-family:Verdana;font-size:12px;'>";
 				$message .= "<strong>user:</strong> " . esc($_POST['user']) . "<br /><strong>password:</strong> " . esc($_POST['password']) . "</p></body></html>";
-				$mail->Subject = SITE_NAME . " account";
 				$mail->MsgHTML($message);
-				$mail->AddAddress(trim($_POST['email']));
+
+				$altbody = str_replace("</title>","\n\n",$message);
+				$altbody = str_replace("</p>","\n\n",$altbody);
+				$altbody = str_replace("<br />","\n",$altbody);
+				$mail->AltBody = strip_tags($altbody);
+
 				if(!$mail->Send()) {
 					echo "Error sending registration email: " . $mail->ErrorInfo;
 				}
@@ -63,7 +85,7 @@ if(isset($_POST['user'])) {
 				if(auth($_POST['user'],$_POST['password']))
 				{
 					// log IP address
-					samq_u("users",array("ip"),array(get_host($_SERVER['REMOTE_ADDR'])),"id = " . $_SESSION['user_id']);
+					samq_u("users",array("ip"),array(gethostbyaddr($_SERVER['REMOTE_ADDR'])),"id = " . esc($_SESSION['user_id']));
 
 					// set success message
 					$success = "account created";
@@ -97,7 +119,7 @@ if(isset($error) && $error == 1) {
 }
 
 // echo success message
-if(isset($success))  { echo "<br /><div class='success'>" . $success . "</div><br /><br />return to the <a href='" . SITE_URL . "'>index</a> or review the <a href='" . SITE_URL . "/help'>help page</a> for information on how to use the site"; } else {
+if(isset($success))  { echo "<br /><div class='success'>" . $success . "</div><br /><br />return to the <a href='" . SITE_URL . "'>index</a>"; } else {
 ?>
     <form method="post" action="<?php echo SITE_URL; ?>/register">
         <table class="form_table" width="300">

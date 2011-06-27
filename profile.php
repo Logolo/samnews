@@ -1,6 +1,23 @@
-<?php include('config.php');
+<?php /*====================================================================================
+		SamNews [http://samjlevy.com/samnews], open-source PHP social news application
+    	sam j levy [http://samjlevy.com]
 
-$profile = samq_c("SELECT login, about, last_visit, created, perm_mod, perm_admin, post_count, comment_count, vote_count, email, ip, voted_count AS score FROM users WHERE login = '" . $_REQUEST['user'] . "'",1);
+    	This program is free software: you can redistribute it and/or modify it under the
+    	terms of the GNU General Public License as published by the Free Software
+    	Foundation, either version 3 of the License, or (at your option) any later
+    	version.
+
+    	This program is distributed in the hope that it will be useful, but WITHOUT ANY
+    	WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+    	PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+
+    	You should have received a copy of the GNU General Public License along with this
+    	program.  If not, see <http://www.gnu.org/licenses/>.
+      ====================================================================================*/
+
+include('config.php');
+
+$profile = samq_c("SELECT login, about, last_visit, created, perm_mod, perm_admin, post_count, comment_count, vote_count, email, ip, voted_count AS score FROM users WHERE login = '" . esc($_GET['user']) . "'",1);
 
 include('head.php');
 
@@ -53,7 +70,7 @@ if(count($profile) > 0) { ?>
             email: <a href="mailto:<?php echo $e['email']; ?>"><?php echo $e['email']; ?></a><br />
             last ip: <?php if(isset($e['ip'])) echo $e['ip']; else echo "none"; ?><br />
             <br />
-            <a href="<?php echo SITE_URL; ?>/edit/u/<?php echo $e['login']; ?>">edit user</a> | <a href="<?php echo SITE_URL; ?>/delete/u/<?php echo $e['login']; ?>">delete user</a> | <a href="<?php echo SITE_URL; ?>/ulist">user list</a></td></tr>
+            <a href="<?php echo SITE_URL; ?>/edit/u/<?php echo $e['login']; ?>">edit user</a> |<?php if($_GET['user'] != "[deleted]" && $_GET['user'] != $_SESSION['user']) { ?> <a href="<?php echo SITE_URL; ?>/delete/u/<?php echo $e['login']; ?>">delete user</a> |<?php } ?> <a href="<?php echo SITE_URL; ?>/ulist">user list</a><?php if($_SESSION['access'] == 3) { ?> | <a href="<?php echo SITE_URL; ?>/ctlist">category list</a><?php } ?></td></tr>
         </table>
 		<?php } ?>
 <?php }?>

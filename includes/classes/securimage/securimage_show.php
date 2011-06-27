@@ -21,6 +21,7 @@ $img->use_transparent_text = true;
 $img->text_transparency_percentage = 30; // 100 = completely transparent
 $img->num_lines = 7;
 $img->line_color = new Securimage_Color("#eaeaea");
+$img->image_signature = "SamNews";
 $img->signature_color = new Securimage_Color(rand(0, 64), rand(64, 128), rand(128, 255));
 $img->use_wordlist = true; 
 

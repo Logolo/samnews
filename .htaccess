@@ -1,40 +1,73 @@
 IndexIgnore *
 ErrorDocument 404 /404.php
 
+Options -MultiViews
 RewriteEngine on
 
-RewriteRule ^about/?$ "about.php"
-RewriteRule ^all-time/?$ "index.php?mode=all-time"
+RewriteRule ^all-time/cat/([^/\.]+)/p/([^/\.]+)/?$ index.php?mode=all-time&cat=$1&p=$2 [L]
+RewriteRule ^all-time/cat/([^/\.]+)/?$ index.php?mode=all-time&cat=$1 [L]
 RewriteRule ^all-time/p/([^/\.]+)/?$ index.php?mode=all-time&p=$1 [L]
-RewriteRule ^comment/?$ "comment.php"
-RewriteRule ^comments/?$ "comment_list.php"
+RewriteRule ^all-time/?$ "index.php?mode=all-time" [L]
+
+RewriteRule ^cat/([^/\.]+)/p/([^/\.]+)/?$ index.php?cat=$1&p=$2 [L]
+RewriteRule ^cat/([^/\.]+)/?$ index.php?cat=$1 [L]
+
+RewriteRule ^comment/?$ "comment.php" [L]
+RewriteRule ^comments/?$ "comment_list.php" [L]
+
 RewriteRule ^delete/c/([^/\.]+)/?$ delete_comment.php?comment=$1 [L]
+RewriteRule ^delete/ct/([^/\.]+)/?$ delete_category.php?cat=$1 [L]
 RewriteRule ^delete/p/([^/\.]+)/?$ delete_post.php?post=$1 [L]
 RewriteRule ^delete/u/([^/\.]+)/?$ delete_user.php?user=$1 [L]
+
 RewriteRule ^edit/p/([^/\.]+)/?$ submit.php?post=$1 [L]
 RewriteRule ^edit/u/([^/\.]+)/?$ edit_user.php?user=$1 [L]
-RewriteRule ^feeds/?$ "feeds.php"
-RewriteRule ^forgot/?$ "forgot.php"
-RewriteRule ^help/?$ "help.php"
-RewriteRule ^login/?$ "login.php"
-RewriteRule ^new/?$ "index.php?mode=new"
+RewriteRule ^edit/ct/([^/\.]+)/?$ category_list.php?cat=$1 [L]
+
+RewriteRule ^forgot/?$ "forgot.php" [L]
+RewriteRule ^login/?$ "login.php" [L]
+
+RewriteRule ^new/cat/([^/\.]+)/p/([^/\.]+)/?$ index.php?mode=new&cat=$1&p=$2 [L]
+RewriteRule ^new/cat/([^/\.]+)/?$ index.php?mode=new&cat=$1 [L]
 RewriteRule ^new/p/([^/\.]+)/?$ index.php?mode=new&p=$1 [L]
+RewriteRule ^new/?$ "index.php?mode=new"
+
 RewriteRule ^p/([^/\.]+)/?$ index.php?p=$1 [L]
-RewriteRule ^register/?$ "register.php"
-RewriteRule ^reset/about/?$ "reset_about.php"
-RewriteRule ^reset/email/?$ "reset_email.php"
-RewriteRule ^reset/forgot?$ "reset_forgot.php"
-RewriteRule ^reset/pw/?$ "reset_pw.php"
-RewriteRule ^rss/?$ "rss.xml"
-RewriteRule ^rss/all-time/?$ "rss_alltime.xml"
-RewriteRule ^rss/new/?$ "rss_new.xml"
-RewriteRule ^search/?$ "sphider/search.php"
-RewriteRule ^submit/?$ "submit.php"
-RewriteRule ^submissions/([^/\.]+)/?$ index.php?mode=submit&user=$1 [L]
+RewriteRule ^register/?$ "register.php" [L]
+RewriteRule ^reset/about/?$ "reset_about.php" [L]
+RewriteRule ^reset/email/?$ "reset_email.php" [L]
+RewriteRule ^reset/forgot/([^/\.]+)/([^/\.]+)/?$ reset_forgot.php?user=$1&key=$2 [L]
+RewriteRule ^reset/forgot?$ "reset_forgot.php" [L]
+RewriteRule ^reset/pw/?$ "reset_pw.php" [L]
+RewriteRule ^search/?$ "search.php" [L]
+RewriteRule ^submit/bulk/?$ "submit_bulk.php" [L]
+RewriteRule ^submit/?$ "submit.php" [L]
+
+RewriteRule ^submissions/([^/\.]+)/cat/([^/\.]+)/p/([^/\.]+)/?$ index.php?mode=submit&user=$1&cat=$2&p=$3 [L]
+RewriteRule ^submissions/([^/\.]+)/cat/([^/\.]+)/?$ index.php?mode=submit&user=$1&cat=$2 [L]
 RewriteRule ^submissions/([^/\.]+)/p/([^/\.]+)/?$ index.php?mode=submit&user=$1&p=$2 [L]
-RewriteRule ^u/([^/\.]+)/?$ profile.php?user=$1 [L]
-RewriteRule ^u/([^/\.]+)/comments/?$ comment_list.php?user=$1 [L]
+RewriteRule ^submissions/([^/\.]+)/?$ index.php?mode=submit&user=$1 [L]
+
 RewriteRule ^u/([^/\.]+)/comments/p/([^/\.]+)/?$ comment_list.php?user=$1&p=$2 [L]
-RewriteRule ^ulist/?$ "user_list.php"
+RewriteRule ^u/([^/\.]+)/comments/?$ comment_list.php?user=$1 [L]
+RewriteRule ^u/([^/\.]+)/?$ profile.php?user=$1 [L]
+
+RewriteRule ^ctlist/?$ "category_list.php" [L]
+RewriteRule ^ulist/?$ "user_list.php" [L]
 RewriteRule ^v/([^/\.]+)/?$ view.php?post=$1 [L]
+
+RewriteRule ^voted/([^/\.]+)/cat/([^/\.]+)/p/([^/\.]+)/?$ index.php?mode=vote&user=$1&cat=$2&p=$3 [L]
+RewriteRule ^voted/([^/\.]+)/cat/([^/\.]+)/?$ index.php?mode=vote&user=$1&cat=$2 [L]
+RewriteRule ^voted/([^/\.]+)/p/([^/\.]+)/?$ index.php?mode=vote&user=$1&p=$2 [L]
 RewriteRule ^voted/([^/\.]+)/?$ index.php?mode=vote&user=$1 [L]
+
+RewriteRule ^rss/all-time/cat/([^/\.]+)/?$ rss.php?mode=all-time&cat=$1 [L]
+RewriteRule ^rss/all-time/?$ "rss.php?mode=all-time" [L]
+RewriteRule ^rss/cat/([^/\.]+)/?$ rss.php?cat=$1 [L]
+RewriteRule ^rss/new/cat/([^/\.]+)/?$ rss.php?mode=new&cat=$1 [L]
+RewriteRule ^rss/new/?$ "rss.php?mode=new" [L]
+RewriteRule ^rss/submissions/([^/\.]+)/cat/([^/\.]+)/?$ rss.php?mode=submit&user=$1&cat=$2 [L]
+RewriteRule ^rss/submissions/([^/\.]+)/?$ rss.php?mode=submit&user=$1 [L]
+RewriteRule ^rss/voted/([^/\.]+)/cat/([^/\.]+)/?$ rss.php?mode=vote&user=$1&cat=$2 [L]
+RewriteRule ^rss/voted/([^/\.]+)/?$ rss.php?mode=vote&user=$1 [L]
+RewriteRule ^rss/?$ "rss.php" [L]

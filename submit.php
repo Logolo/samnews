@@ -1,8 +1,25 @@
-<?php include('config.php');
+<?php /*====================================================================================
+		SamNews [http://samjlevy.com/samnews], open-source PHP social news application
+    	sam j levy [http://samjlevy.com]
 
-if(isset($_SESSION['access']) && ($_SESSION['access'] == 2 || $_SESSION['access'] == 3) && isset($_REQUEST['post'])) {
+    	This program is free software: you can redistribute it and/or modify it under the
+    	terms of the GNU General Public License as published by the Free Software
+    	Foundation, either version 3 of the License, or (at your option) any later
+    	version.
+
+    	This program is distributed in the hope that it will be useful, but WITHOUT ANY
+    	WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+    	PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+
+    	You should have received a copy of the GNU General Public License along with this
+    	program.  If not, see <http://www.gnu.org/licenses/>.
+      ====================================================================================*/
+
+include('config.php');
+
+if(isset($_SESSION['access']) && ($_SESSION['access'] == 2 || $_SESSION['access'] == 3) && isset($_GET['post'])) {
 	$mode = "edit";
-	$post_result = samq("post","id,title,slug,url,description",NULL,"id = " . esc($_REQUEST['post']));
+	$post_result = samq("post","id,title,slug,url,description,category",NULL,"id = " . esc($_GET['post']));
 } else {
 	$mode = "new";	
 }
@@ -22,6 +39,7 @@ if(isset($_SESSION['user']) && isset($_POST['title'])) {
 	elseif(strlen(trim($_POST['url'])) > 255) { $error = 1; $error_msg[] = "url cannot be longer than 255 characters"; }
 
 	if(trim($_POST['description']) == "") $description = NULL; else $description = $_POST['description'];
+	$category = $_POST['category'];
 
 	if($error == 0) {
 		if($mode == "edit") {
@@ -30,22 +48,22 @@ if(isset($_SESSION['user']) && isset($_POST['title'])) {
 			$slug = slugify(replace_schars(trim($_POST['title'])));
 		}
 		
-		$domain = preg_match("/^(http:\/\/)?([^\/]+)/i", $_POST['url'], $domain_only);
-		$domain = str_replace("www.","",$domain_only[2]);
+		$domain = parse_url(trim($_POST['url']), PHP_URL_HOST);
+		$domain = str_replace("www.","",$domain);
 
 		if($mode == "new") {
 			// passed check, execute insert
-			samq_i("post",array("title","slug","url","domain","author","description","score","ip","created"),array($_POST['title'],$slug,$_POST['url'],$domain,$_SESSION['user_id'],$description,1,get_host($_SERVER['REMOTE_ADDR']),DATETIME_NOW));
-	
+			samq_i("post",array("title","slug","url","domain","author","description","category","score","ip","created"),array($_POST['title'],$slug,$_POST['url'],$domain,$_SESSION['user_id'],$description,$category,1,gethostbyaddr($_SERVER['REMOTE_ADDR']),DATETIME_NOW));
 			// add one to user's score
 			samq_c("UPDATE users SET post_count = post_count + 1 WHERE id = " . esc($_SESSION['user_id']));
 		} elseif($mode == "edit") {
 			// passed check, execute update
-			samq_u("post",array("title","slug","url","domain","description"),array($_POST['title'],$slug,$_POST['url'],$domain,$description), "id = " . $post_result[0]['id']);
+			samq_u("post",array("title","slug","url","domain","description","category"),array($_POST['title'],$slug,$_POST['url'],$domain,$description,$category), "id = " . $post_result[0]['id']);
 		}
 
 		// redirect to slug
 		header("Location: " . SITE_URL . "/v/" . $slug);
+		die();
 	}
 }
 
@@ -59,7 +77,7 @@ include('head.php'); ?>
 </script>
 
 <script type="text/javascript">
-$(function() {
+jQuery(function() {
 	<!-- jQuery autoresize comment textarea -->
 	$("#description").elastic();
 });
@@ -68,7 +86,8 @@ $(function() {
 <br />
 
 <div class="content">
-<span class="page_title"><?php if($mode=="new") { echo "submit"; } elseif($mode=="edit") { echo "edit"; } ?></span><br />
+<span class="page_title"><?php if($mode=="new") { echo "submit"; } elseif($mode=="edit") { echo "edit"; } ?></span><?php if(isset($_SESSION['access']) && $_SESSION['access'] == 3) { ?> <span class="admin_link"><a href="<?php echo SITE_URL . "/submit/bulk"; ?>">submit bulk</a><?php } ?></span>
+<br />
 <?php if(isset($_SESSION['user'])) {
 
 	// echo error message
@@ -101,10 +120,20 @@ $(function() {
             </tr>
         </table>
         <br />
+        <table class="form_table" width="500">
+            <tr><td><strong>category</strong><br />
+            <div style="padding-bottom:4px;">
+            	<select name="category">
+                <?php foreach(samq("category","*",NULL,NULL,"name") as $e) {
+					echo "<option value='" . $e['id'] . "'" . (((isset($_POST['category']) && $_POST['category'] == $e['id']) || ($mode=="edit" && $e['id'] == $post_result[0]['category']) || (!isset($_POST['category']) && $mode != "edit" && $e['id'] == 5) ? " selected='selected'" : "")) . ">" . $e['name'] . "</option>";
+				} ?>
+                </select>
+            </div>
+            </tr>
+        </table>
+        <br />
         <input type="submit" name="submit" value="submit" />
     </form>
-    <br />
-    please make sure this link has not already been posted</a>
 <?php } else { ?>
 	<br />you must <a href="<?php echo SITE_URL; ?>/login">login</a> to submit an article | don't have an account? <a href="<?php echo SITE_URL; ?>/register">register here</a>
 <?php } ?>

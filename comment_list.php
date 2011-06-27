@@ -1,25 +1,42 @@
-<?php include('config.php');
+<?php /*====================================================================================
+		SamNews [http://samjlevy.com/samnews], open-source PHP social news application
+    	sam j levy [http://samjlevy.com]
+
+    	This program is free software: you can redistribute it and/or modify it under the
+    	terms of the GNU General Public License as published by the Free Software
+    	Foundation, either version 3 of the License, or (at your option) any later
+    	version.
+
+    	This program is distributed in the hope that it will be useful, but WITHOUT ANY
+    	WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+    	PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+
+    	You should have received a copy of the GNU General Public License along with this
+    	program.  If not, see <http://www.gnu.org/licenses/>.
+      ====================================================================================*/
+
+include('config.php');
 
 // find limit numbers
-if(!isset($_REQUEST['p'])) {
+if(!isset($_GET['p'])) {
 	$current_page = 1;
 	$start = 0;
 } else {
-	$current_page = $_REQUEST['p'];
+	$current_page = $_GET['p'];
 	$start = ($current_page - 1) * INDEX_DISPLAY;
 }
 $end = INDEX_DISPLAY;
 
 // query comments
-if(isset($_REQUEST['user'])) {
-	$comment_count_result = samq("comment","COUNT(comment.id) AS comment_count","INNER JOIN users ON comment.author = users.id","users.login = '" . esc($_REQUEST['user']) . "'","comment.created DESC");
-	$comment = samq_c("SELECT comment.id,post,perm_mod,perm_admin,login,thread,text,comment.author,users.voted_count AS user_score,comment.score,comment.created,slug,title FROM comment INNER JOIN users ON author = users.id INNER JOIN post ON comment.post = post.id WHERE users.login = '" . esc($_REQUEST['user']) . "' ORDER BY comment.created DESC LIMIT " . $start . ", " . $end,1);
+if(isset($_GET['user'])) {
+	$comment_count_result = samq("comment","COUNT(comment.id) AS comment_count","INNER JOIN users ON comment.author = users.id","users.login = '" . esc($_GET['user']) . "'","comment.created DESC");
+	$comment = samq_c("SELECT comment.id,post,perm_mod,perm_admin,login,thread,text,comment.author,users.voted_count AS user_score,comment.score,comment.created,slug,title FROM comment INNER JOIN users ON author = users.id INNER JOIN post ON comment.post = post.id WHERE users.login = '" . esc($_GET['user']) . "' ORDER BY comment.created DESC LIMIT " . esc($start) . ", " . esc($end),1);
 	
 	// set page head
-	$page_head = trim($_REQUEST['user']) . "'s comments";
+	$page_head = trim($_GET['user']) . "'s comments";
 } else {
 	$comment_count_result = samq("comment","COUNT(comment.id) AS comment_count","INNER JOIN users ON comment.author = users.id",NULL,"comment.created DESC");
-	$comment = samq_c("SELECT comment.id,post,perm_mod,perm_admin,login,thread,text,comment.author,users.voted_count AS user_score,comment.score,comment.created,slug,title FROM comment INNER JOIN users ON author = users.id INNER JOIN post ON comment.post = post.id ORDER BY comment.created DESC LIMIT " . $start . ", " . $end,1);	
+	$comment = samq_c("SELECT comment.id,post,perm_mod,perm_admin,login,thread,text,comment.author,users.voted_count AS user_score,comment.score,comment.created,slug,title FROM comment INNER JOIN users ON author = users.id INNER JOIN post ON comment.post = post.id ORDER BY comment.created DESC LIMIT " . esc($start) . ", " . esc($end),1);
 
 	// set page head
 	$page_head = "comments";
@@ -83,7 +100,7 @@ if(count($comment) > 0) {
 		// previous link
 		if($current_page != 1) {
 			echo "<a href='";
-			if($current_page == 2) echo SITE_URL . "/u/" . trim($_REQUEST['user']) . "/comments"; else echo SITE_URL . "/u/" . trim($_REQUEST['user']) . "/comments/p/" . ($current_page - 1);
+			if($current_page == 2) echo SITE_URL . "/u/" . trim($_GET['user']) . "/comments"; else echo SITE_URL . "/u/" . trim($_GET['user']) . "/comments/p/" . ($current_page - 1);
 			echo "'>prev</a>";
 		}
 		
@@ -94,7 +111,7 @@ if(count($comment) > 0) {
 	
 		// next link
 		if($current_page != $pages) {
-			echo "<a href='" . SITE_URL . "/u/" . trim($_REQUEST['user']) . "/comments/p/" . ($current_page + 1) . "'>more</a>";
+			echo "<a href='" . SITE_URL . "/u/" . trim($_GET['user']) . "/comments/p/" . ($current_page + 1) . "'>more</a>";
 		} ?>
 		</span>
 	<?php } ?>
