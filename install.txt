@@ -1,0 +1,63 @@
+SamNews version 1.0
+http://samjlevy.com/samnews
+
+========================================
+		FEATURES		
+========================================
+- CAPTCHA to prevent spam
+- Account system
+- Forgot password and password reset functionality (with e-mailer)
+- Remembered/cookied sessions
+- Comment system (inline replies, two tiered system)
+- Automatic YouTube embeds (when YouTube links posted)
+- RSS feed generation
+- Packaged Sphider search engine
+- jQuery tooltips
+- Admin controls: edit/delete users, comments, and links
+- Minimal design that's intuitive, appealing, and easy to skin
+- Light weight, fast PHP
+- Uses mod-rewrite for clean/descriptive URLs
+- Ajax vote up/down for links
+- IP logging
+- Facebook Like and Twitter Tweet buttons for submitted links
+
+========================================
+	    INSTALL SAMNEWS
+========================================
+1. Upload contents to web server
+2. Import two SQL files in /sql to sql server (into two seperate databases, ie: samnews, samnews_sphider)
+3. Change database information (lines 7-10) in /config.php (should point to the database made from samnews.sql)
+4. Change SITE_URL (line 17), DEVELOPER_EMAIL (line 30), RSS_KEY (line 33), COOKIE_PREFIX (line 38)
+5. Configure SMTP email server information in /includes/email_setup.php - this is necessary for Registration/Forgot Password email notifications
+	See http://phpmailer.worxware.com/ for support with PHPMailer
+6. Visit the site and log in with the username: admin and the password: password
+7. IMPORTANT: After logging in, go to the 'edit user' page under the admin's profile (click on admin next to logout at the top right)
+8. Change the password (enter a new one in the blank), email address, and cookie key (to something random/unique) - if you do not change these values the account could be hijacked
+
+========================================
+    CONFIGURE SPHIDER SEARCH ENGINE
+ by Ando Saabas - http://www.sphider.eu/
+========================================
+9. Change database information (lines 2-5) in /sphider/settings/database.php (should point to the database made from samnews_sphider.sql)
+10. Change Sphider user name and password (lines 3-4) in /sphider/admin/auth.php to something unique
+11. Visit /sphider/admin/admin.php in your browser, log in with your Sphider user name and password
+12. Under the Sites tab, click 'Add Site'
+13. Type the complete URL to your SamNews installation in the URL field
+14. Type an alias for your site in the Title field
+
+15. After the site has been added to Sphider, you can 'Re-index' it, and do this manually every so often to keep your search results up to date
+	- OR - You can set up a CRON job on your server to execute Sphider's crawler automatically
+
+	The CRON command is - replace the bracketed text with your information:
+	php [LOCAL PATH TO YOUR PUBLIC_HTML DIRECTORY]/sphider/admin/spider.php url=[SAME VALUE FOR THE URL FIELD YOU USED WHEN ADDING THE SITE TO SPHIDER] reindex=1 soption=full out=show_faces
+	(Note: The out=show_faces prevents Sphider from indexing pages with show_faces - these are the Facebook buttons and without it your search results will be polluted)
+
+========================================
+     CONFIGURE RSS FEED GENERATION
+========================================
+16. Set up three CRON jobs (one for each of the 3 RSS files to be generated) - replace the bracketed text with your information:
+	lynx -dump "[SITE URL]/cron/gen_rss.php?mode=index&key=[RSS_KEY FROM CONFIG.PHP]"
+	lynx -dump "[SITE URL]/cron/gen_rss.php?mode=new&key=[RSS_KEY FROM CONFIG.PHP]"
+	lynx -dump "[SITE URL]/cron/gen_rss.php?mode=alltime&key=[RSS_KEY FROM CONFIG.PHP]"
+
+If you have any questions visit http://samjlevy.com/samnews

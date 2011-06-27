@@ -1,0 +1,40 @@
+IndexIgnore *
+ErrorDocument 404 /404.php
+
+RewriteEngine on
+
+RewriteRule ^about/?$ "about.php"
+RewriteRule ^all-time/?$ "index.php?mode=all-time"
+RewriteRule ^all-time/p/([^/\.]+)/?$ index.php?mode=all-time&p=$1 [L]
+RewriteRule ^comment/?$ "comment.php"
+RewriteRule ^comments/?$ "comment_list.php"
+RewriteRule ^delete/c/([^/\.]+)/?$ delete_comment.php?comment=$1 [L]
+RewriteRule ^delete/p/([^/\.]+)/?$ delete_post.php?post=$1 [L]
+RewriteRule ^delete/u/([^/\.]+)/?$ delete_user.php?user=$1 [L]
+RewriteRule ^edit/p/([^/\.]+)/?$ submit.php?post=$1 [L]
+RewriteRule ^edit/u/([^/\.]+)/?$ edit_user.php?user=$1 [L]
+RewriteRule ^feeds/?$ "feeds.php"
+RewriteRule ^forgot/?$ "forgot.php"
+RewriteRule ^help/?$ "help.php"
+RewriteRule ^login/?$ "login.php"
+RewriteRule ^new/?$ "index.php?mode=new"
+RewriteRule ^new/p/([^/\.]+)/?$ index.php?mode=new&p=$1 [L]
+RewriteRule ^p/([^/\.]+)/?$ index.php?p=$1 [L]
+RewriteRule ^register/?$ "register.php"
+RewriteRule ^reset/about/?$ "reset_about.php"
+RewriteRule ^reset/email/?$ "reset_email.php"
+RewriteRule ^reset/forgot?$ "reset_forgot.php"
+RewriteRule ^reset/pw/?$ "reset_pw.php"
+RewriteRule ^rss/?$ "rss.xml"
+RewriteRule ^rss/all-time/?$ "rss_alltime.xml"
+RewriteRule ^rss/new/?$ "rss_new.xml"
+RewriteRule ^search/?$ "sphider/search.php"
+RewriteRule ^submit/?$ "submit.php"
+RewriteRule ^submissions/([^/\.]+)/?$ index.php?mode=submit&user=$1 [L]
+RewriteRule ^submissions/([^/\.]+)/p/([^/\.]+)/?$ index.php?mode=submit&user=$1&p=$2 [L]
+RewriteRule ^u/([^/\.]+)/?$ profile.php?user=$1 [L]
+RewriteRule ^u/([^/\.]+)/comments/?$ comment_list.php?user=$1 [L]
+RewriteRule ^u/([^/\.]+)/comments/p/([^/\.]+)/?$ comment_list.php?user=$1&p=$2 [L]
+RewriteRule ^ulist/?$ "user_list.php"
+RewriteRule ^v/([^/\.]+)/?$ view.php?post=$1 [L]
+RewriteRule ^voted/([^/\.]+)/?$ index.php?mode=vote&user=$1 [L]

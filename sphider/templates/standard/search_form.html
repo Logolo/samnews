@@ -1,0 +1,13 @@
+<br />
+
+<div class="content">
+<span class="page_title">search</span><br />
+<table class="form_table">
+    <tr><td>
+	<form action="<?php echo SITE_URL; ?>/search/" method="get">
+    	<input type="text" name="query" id="query" size="40" value="<?php print quote_replace($query);?>" /> <input type="submit" value="submit" />
+		<input type="hidden" name="search" value="1" />
+	</form>
+	</td></tr>
+</table>
+</div>

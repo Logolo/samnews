@@ -1,0 +1,388 @@
+/* body */
+	body {
+		font-family:Verdana;
+		font-size:12px;
+		margin:0;
+		padding:0;
+	}
+	.hidden_div {
+		display:none;	
+	}
+	img {
+		border:none;	
+	}
+
+/* comment */
+	.comments {
+		width:600px;	
+	}
+	.comment_author {
+		font-weight:bold;	
+	}
+	.comment_head_tr td {
+		padding-right:2px;
+	}
+	.comment_inner {
+		width:90%;
+		margin-left:auto;
+	}
+	.comment_inner table {
+		width:100%;
+	}
+	.comment_list_head_tr {
+		font-weight:bold;
+		font-size:14px;
+	}
+	.comment_list_head_tr td {
+		padding-left:4px;
+		padding-top:4px;
+		width:0; /* IE hack */
+	}
+	.comment_date_td {
+		text-align:right;	
+	}
+	.comment_outer {
+		width:100%;	
+	}
+	.comment_outer table {
+		width:100%;
+	}
+	.comment_reply_text {
+		text-align:right;
+	}
+	.comment_table {
+		border-collapse:collapse;
+		background-color:#d1d1d1;
+	}
+	.comment_text a:link {
+		text-decoration:underline;	
+	}
+	.comment_text_td {
+		padding:10px;
+		line-height:150%;
+		width:0; /* IE hack */
+	}
+	.comment_text_outer_tr {
+		background-color:#e1e1e1;	
+	}
+	.comment_text_inner_tr {
+		background-color:#ffffff;
+	}
+	.comment_up_td {
+		width:20px;
+		text-align:left;
+	}
+	.comment_votes_outer {
+		font-size:18px;
+		font-weight:bold;
+	}
+	.comment_votes_outer a:hover {
+		text-decoration:none;	
+	}
+	.comment_votes_td {
+		text-align:center;
+		width:25px;
+	}
+	.my_comment {
+		border:3px dashed #dbfed4;
+	}
+	.reply_div {
+		margin-top:10px;	
+	}
+
+/* form */
+	input,select,button,textarea {
+		font-family:Verdana;
+		font-size:12px;
+	}
+	.form_table {
+		border-collapse:collapse;
+		border:1px dashed #efefef;
+		-moz-border-radius:7px 7px 7px 7px;
+		background-color:#ffffff;
+	}
+	.form_table td {
+		padding:10px;
+		line-height:150%;
+	}
+
+/* help */
+	img .help {
+		margin-top:4px;
+	}
+
+/* main */
+	.bottom_row {
+		background-color:#d1d1d1;
+		font-size:14px;
+		color:#ffffff;
+		height:30px;
+	}
+	.bottom_row td{
+		padding-left:6px;
+		padding-right:6px;
+	}
+	.content {
+		margin-left:20px;	
+	}
+	.content a:link {
+		text-decoration:underline;
+	}
+	.head_text {
+		font-weight:bold;
+		font-size:20px;
+		color:#fff;
+	}
+	.head_text a:hover {
+		text-decoration:none;
+	}
+	.main_table {
+		margin:0 auto;
+		width:85%;
+		padding:0px;
+		border:none;
+		background-color:#efefef;
+		font-family:Verdana;
+		font-size:12px;
+		vertical-align:top;
+		border-collapse:collapse;
+	}
+	.notice {
+		background:#FFCCFF;
+		text-align:center;
+		font-size:13px;
+		padding-top:2px;
+		padding-bottom:2px;	
+	}
+	.page_title {
+		font-size:24px;
+		font-weight:bold;
+	}
+	.profile_score {
+		font-size:18px;	
+	}
+	.rss_table {
+		border:none;
+		margin:0;
+		padding:0;
+	}
+	.rss_table td {
+		padding:5px;	
+	}
+	.samnews_text {
+		font-size:13px;
+		color:black;
+	}
+	.top_row {
+		background-color:#09F;
+		font-size:14px;
+		color:#000;
+		height:30px;
+	}
+	.top_row a:link {
+		color:#fff;	
+	}
+	.top_row a:visited {
+		color:#fff;	
+	}
+	.top_row td {
+		padding-left:4px;
+		padding-right:6px;
+	}
+
+/* links */
+	a:link {
+		color:#000000;
+		text-decoration:none;
+	}
+	a:visited {
+		text-decoration:none;
+		color:#333;
+	}
+	a:hover {
+		text-decoration:underline;
+		color:#0099FF;
+	}
+	a:active {
+		text-decoration:none;
+		color:#000000;
+	}
+
+/* listing */
+	.listing_count {
+		font-size:11px;
+	}
+	.listing_count_td {
+		width:15px;
+		text-align:center;
+	}
+	.listing_details {
+		color:#666666;	
+	}
+	.listing_domain {
+		color:#666666;
+		font-variant:small-caps;
+	}
+	.listing_left_spacer1_td {
+		width:8px;	
+	}
+	.listing_left_spacer2_td {
+		width:10px;	
+	}
+	.listing_top_tr {
+		height:28px;	
+	}
+	.listing_spacer_tr {
+		height:12px;	
+	}
+	.listing_table {
+		width:100%;
+		border:none;
+		border-collapse:collapse;
+		text-align:left;
+		vertical-align:top;
+		padding-left:10px;
+	}
+	.listing_title {
+		font-size:16px;	
+	}
+	.listing_up_td {
+		width:20px;	
+	}
+	.listing_votes_outer {
+		font-size:18px;
+		font-weight:bold;
+	}
+	.listing_votes_outer a:hover {
+		text-decoration:none;	
+	}
+	.listing_votes_td {
+		text-align:center;
+		width:30px;
+	}
+
+/* messages */
+	div.error {
+		color:#ff0000;
+		font-weight:bold;
+	}
+	div.success {
+		color:#0C0;
+		font-weight:bold;;
+	}
+	div.warning {
+		color:#0000FF;
+		font-weight:bold;
+	}
+	label.error {
+		color:#ff0000;
+		display:block;
+		float:none;
+		width:100%;
+	}
+
+/* tooltip */
+	#tooltip{
+		position:absolute;
+		border:1px dashed #efefef;
+		-moz-border-radius:7px 7px 7px 7px;
+		background:#ffffff;
+		padding:10px;
+		display:none;
+		width:25%;
+		opacity:.95;
+	}
+
+/* user controls */
+	.uc_table {
+		border-collapse:collapse;
+		border:1px solid #a4fc94;
+		-moz-border-radius:7px 7px 7px 7px;
+		background-color:#dbfed4;
+	}
+	.uc_table td {
+		padding:10px;
+		line-height:150%;
+	}
+
+/* view */
+	.view_description {
+		font-size:14px;
+		width:75%;
+		padding:10px;
+		line-height:150%;
+		border: 1px solid #09F;
+		-moz-border-radius:7px 7px 7px 7px;
+		background-color:#F9F9F9;
+	}
+	.view_description a:link {
+		text-decoration:underline;
+	}
+
+/* search */
+	#did_you_mean {
+		padding-bottom:20px;
+	}
+	#powered_by {
+		color:#666666;
+		margin-left:30px;	
+	}
+	#results {
+		padding-top:20px;
+		width:50%;
+	}
+	#results a:link {
+		text-decoration:underline;	
+	}
+	#results_content {
+		font-size:12px;
+	}
+	#results_content {
+		margin-left:30px;
+	}
+	#results .url {
+		color:#666666;
+		font-size:12px;
+	}
+
+/* admin */
+	.admin_link {
+		background:#ffffd4;
+		border:1px solid yellow;
+		padding:2px;
+	}
+	.admin_link a:link {
+		text-decoration: none;	
+	}
+	.admin_link a:hover {
+		text-decoration: underline;
+	}
+	.admin_table {
+		border-collapse:collapse;
+		border:1px solid yellow;
+		-moz-border-radius:7px 7px 7px 7px;
+		background-color:#ffffd4;
+	}
+	.admin_table td {
+		padding:10px;
+		line-height:150%;
+	}
+	.letter_admin {
+		color:white;
+		font-weight:bold;
+	}
+	.letter_mod {
+		color:white;
+		font-weight:bold;
+	}
+	.ulist {
+		border:none;
+		margin:0 auto;
+		padding:0;
+		border-collapse:collapse;
+		width:100%;
+	}
+	.ulist td {
+		padding:2px;
+		border:1px solid black;
+	}
