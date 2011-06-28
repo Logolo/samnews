@@ -1,5 +1,5 @@
 <?php
-define('SITE_URL', 'http://dev1/samnews_11'); // DO NOT INCLUDE A TRAILING SLASH
+define('SITE_URL', 'http://dev1/samnews'); // DO NOT INCLUDE A TRAILING SLASH
 define('SITE_NAME','SamNews');
 define('SITE_SLOGAN','social news application');
 define('SITE_META_KEYWORDS','');
