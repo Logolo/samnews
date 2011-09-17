@@ -34,7 +34,7 @@ Release:        04/18/2011
     - Minimal design that's intuitive, appealing, and easy to skin
     - Light weight, fast PHP
     - Uses mod-rewrite for clean/descriptive URLs
-    - Ajax vote up/down for links
+    - Ajax vote up for links
     - IP logging
     - Facebook Like and Twitter Tweet buttons for submitted links
     - Posts can be assigned to categories
